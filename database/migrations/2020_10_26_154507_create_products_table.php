@@ -20,7 +20,8 @@ class CreateProductsTable extends Migration
             $table->string('brand');
             $table->string('category');
             $table->string('description');
-            $table->integer('rating')->default(0);
+            $table->string('img');
+            $table->integer('rating')->nullable();
             $table->integer('num_review')->default(0);
             $table->float('price')->default(0);
             $table->integer('quantity')->default(0);

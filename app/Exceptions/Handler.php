@@ -2,7 +2,13 @@
 
 namespace App\Exceptions;
 
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Throwable;
 
 class Handler extends ExceptionHandler
 {
@@ -33,5 +39,55 @@ class Handler extends ExceptionHandler
     public function register()
     {
         //
+    }
+    public function render($request, Throwable $exception)
+    {
+        if ($exception instanceof ModelNotFoundException) {
+            $modelName = Str::lower(class_basename($exception->getModel()));
+
+            return response([
+                "message" => "Model not found.",
+                "errors" => [
+                    $modelName => [
+                        "No {$modelName} found with the provided id.",
+                    ],
+                ],
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        if ($exception instanceof NotFoundHttpException) {
+            return response([
+                "message" => "Invalid Url.",
+                "errors" => [
+                    "url" => [
+                        "{$request->fullUrl()} is invalid.",
+                    ],
+                ],
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        if ($exception instanceof MethodNotAllowedHttpException) {
+            return response([
+                "message" => "Method not allowed.",
+                "errors" => [
+                    "url" => [
+                        "The {$request->method()} method is not supported for {$request->fullUrl()}",
+                    ],
+                ],
+            ], Response::HTTP_METHOD_NOT_ALLOWED);
+        }
+
+        if (config('app.debug')) {
+            return parent::render($request, $exception);
+        }
+
+        return response([
+            "message" => "Server Error",
+            "errors" => [
+                'server' => [
+                    "Please try again.",
+                ],
+            ],
+        ], Response::HTTP_INTERNAL_SERVER_ERROR);
     }
 }

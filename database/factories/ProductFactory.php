@@ -28,6 +28,13 @@ class ProductFactory extends Factory
             'brand' => $this->faker->randomElement(['Amazon', 'Apple', 'Samsung']),
             'category' => $this->faker->randomElement(['laptop', 'mobile', 'others']),
             'description' => $this->faker->sentence(2),
+            'img' => $this->faker->randomElement([
+                '/img/airpods.jpg',
+                '/img/alexa.jpg',
+                '/img/camera.jpg',
+                '/img/mouse.jpg',
+                '/img/phone.jpg',
+                '/img/playstation.jpg']),
             'rating' => 0,
             'num_review' => 0,
             'price' => $this->faker->randomFloat(null, 1, 100),
